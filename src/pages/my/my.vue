@@ -15,7 +15,7 @@
       <view class="edit-btn" @click="editInfo">编辑资料</view>
     </view>
 
-    <div class="occupation"></div>
+    <view class="occupation"></view>
     <view class="jiuyin-box">
       <view class="box box1" @click="myGameAccount">
         <view class="box-left">
@@ -28,7 +28,26 @@
           mode="widthFix"
         ></image>
       </view>
-            <view class="box box2" @click="myAddress">我的地址</view>
+      <view class="box box2" @click="myAddress">我的地址</view>
+    </view>
+
+    <view class="container">
+      <view class="menu-list">
+        <view class="menu-item" @click="openGameList">
+          <view style="display: flex; align-items: center">
+            <image
+              style="width: 30rpx; height: 30rpx; margin-right: 10rpx"
+              src="https://s1.locimg.com/2025/04/10/bb047117570a3.png"
+            ></image>
+            <view>贴吧-游戏账号列表</view>
+          </view>
+          <image
+            src="https://s1.locimg.com/2025/04/10/57b6c2c68f18d.png"
+            style="width: 30rpx; height: 30rpx"
+            mode="widthFix"
+          ></image>
+        </view>
+      </view>
     </view>
   </view>
 </template>
@@ -62,6 +81,12 @@
   const editInfo = () => {
     uni.navigateTo({
       url: '/pages/my/info',
+    });
+  };
+  const openGameList = () => {
+    console.log('=========');
+    uni.navigateTo({
+      url: '/pages/admin/gameAccounts',
     });
   };
 
@@ -200,6 +225,28 @@
       background:
         linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)),
         url('https://s1.locimg.com/2025/04/10/c15d3545441ca.jpg') center/cover no-repeat;
+    }
+  }
+  .container{
+    position: absolute;
+    top: 550rpx;
+    width: 100%;
+    z-index: 9;
+  }
+  .menu-list {
+    width: 100%;
+    padding: 30rpx;
+    overflow: hidden;
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20rpx 15rpx;
+      background: #fff;
+      font-size: 28rpx;
+      font-weight: 600;
+      border-radius: 10rpx;
     }
   }
 </style>
