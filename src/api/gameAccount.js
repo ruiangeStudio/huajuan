@@ -55,3 +55,24 @@ export const deleteGameAccountAPI = (id) => {
     method: 'delete',
   });
 };
+
+/**
+ * 获取所有游戏账号列表
+ */
+export function getAllGameAccountAPI() {
+  return httpRequest.request({
+    url: '/gameAccount/all',
+    method: 'get',
+  });
+}
+
+/**
+ * 导出并下载所有账号
+ */
+export function exportGameAccountAPI() {
+  return httpRequest.request({
+    url: '/gameAccount/export',
+    method: 'get',
+    responseType: 'blob',
+  });
+}

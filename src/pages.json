@@ -91,6 +91,13 @@
         "navigationBarTitleText": "",
         "enablePullDownRefresh": false
       }
+    },
+    {
+      "path": "pages/admin/gameAccounts",
+      "style": {
+        "navigationBarTitleText": "游戏账号",
+        "enablePullDownRefresh": false
+      }
     }
   ],
   "globalStyle": {
