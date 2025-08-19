@@ -7,7 +7,7 @@
         <text>视频/图片去水印使用帮助</text>
       </view>
       <view class="help-steps">
-        <view class="step">1. 复制抖音视频链接到输入框</view>
+        <view class="step">1. 复制 视频/图片 链接到输入框</view>
         <view class="step">2. 点击"解析视频"按钮</view>
         <view class="step">3. 等待解析完成</view>
         <view class="note">注: 解析内容均来自互联网，本小程序不对内容进行负责</view>
