@@ -91,10 +91,10 @@
       dataLength.value = data.length;
       list.value = (data || []).filter((item) => item.is_default);
     } catch (error) {
-      console.error('获取账号列表失败：', error);
+      console.error('获取账号列表失败：', error.data.message);
       list.value = [];
       await uni.showToast({
-        title: '获取数据失败',
+        title: error.data.message,
         icon: 'none',
       });
     } finally {
@@ -114,7 +114,8 @@
 
   // 导出表格功能（小程序专用）
   const exportTable = async () => {
-    if (exportLoading.value || list.value.length === 0) return;
+    console.log('开始导出表格');
+    if (exportLoading.value ) return;
     exportLoading.value = true;
     uni.downloadFile({
       url: `${import.meta.env.VITE_APP_API_URL}/gameAccount/export`,
