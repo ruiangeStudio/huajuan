@@ -82,9 +82,8 @@
     });
   };
   const myAddress = () => {
-    uni.showToast({
-      title: '开发中',
-      icon: 'none',
+    uni.navigateTo({
+      url: '/pages/address/list',
     });
   };
 

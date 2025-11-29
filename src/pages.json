@@ -88,7 +88,7 @@
     {
       "path": "pages/forms/list",
       "style": {
-        "navigationBarTitleText": "",
+        "navigationBarTitleText": "我的九阴",
         "enablePullDownRefresh": false
       }
     },
@@ -96,6 +96,20 @@
       "path": "pages/admin/gameAccounts",
       "style": {
         "navigationBarTitleText": "游戏账号",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/address/list",
+      "style": {
+        "navigationBarTitleText": "我的地址",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/address/add",
+      "style": {
+        "navigationBarTitleText": "我的地址",
         "enablePullDownRefresh": false
       }
     }
