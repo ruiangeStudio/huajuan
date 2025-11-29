@@ -13,10 +13,12 @@ const uploadUtil = async (file, path) => {
       path:`huajuan/${path}`, // 上传路径
     },
   });
+
   try {
     const dataInfo = JSON.parse(data);
-    if ('url' in dataInfo) {
-      return dataInfo.url;
+    const storeData =dataInfo.data;
+    if ('url' in storeData) {
+      return storeData.url;
     } else {
       return false;
     }

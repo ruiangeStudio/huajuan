@@ -43,6 +43,7 @@
     userIfo.value.avatar = res.detail.avatarUrl;
 
     const avatar = await uploadUtil(res.detail.avatarUrl, 'avatar');
+    console.log(avatar,'avatar');
     if (!avatar) {
       uni.hideLoading();
       await uni.showToast({

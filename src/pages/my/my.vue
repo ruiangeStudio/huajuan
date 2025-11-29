@@ -47,6 +47,16 @@
             mode="widthFix"
           ></image>
         </view>
+        <view class="menu-item" @click="clearCache">
+          <view style="display: flex; align-items: center">
+            <view>清除缓存</view>
+          </view>
+          <image
+            src="https://s1.locimg.com/2025/04/10/57b6c2c68f18d.png"
+            style="width: 30rpx; height: 30rpx"
+            mode="widthFix"
+          ></image>
+        </view>
       </view>
     </view>
   </view>
@@ -87,6 +97,14 @@
     console.log('=========');
     uni.navigateTo({
       url: '/pages/admin/gameAccounts',
+    });
+  };
+
+  const clearCache = () => {
+    uni.clearStorageSync();
+    uni.showToast({
+      title: '缓存已清除',
+      icon: 'none'
     });
   };
 
@@ -247,6 +265,7 @@
       font-size: 28rpx;
       font-weight: 600;
       border-radius: 10rpx;
+      margin-bottom: 20rpx;
     }
   }
 </style>
