@@ -176,21 +176,16 @@
   const videoUrl = ref('');
   const videoPlayUrl = ref('');
   const getVideo = () => {
-    videoUrl.value = info.value.video_data.wm_video_url_HQ;
-    videoPlayUrl.value = info.value.video_data.nwm_video_url;
+    videoUrl.value = info.value.wm_video_url_hq[0];
+    videoPlayUrl.value = info.value.wm_video_url_hq[0];
     console.log('videoPlayUrl', videoPlayUrl.value);
     console.log('share', share.value);
     console.log('videoContext', videoContext.value);
-    // if (videoContext.value && share.value === '1' && videoPlayUrl.value) {
-    //   const direction = 0
-    //   videoContext.value.requestFullScreen({
-    //     direction: direction
-    //   })
-    // }
   };
 
   const getImagesList = () => {
-    imageList.value = info.value?.image_data?.no_watermark_image_list || [];
+    console.log('info', info.value);
+    imageList.value = info.value?.no_watermark_image_list || [];
     console.log(imageList.value.length);
   };
 

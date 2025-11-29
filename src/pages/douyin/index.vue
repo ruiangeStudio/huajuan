@@ -94,6 +94,8 @@
         url: videoUrl.value,
       });
 
+      console.log(data);
+      
       if (code !== 2000) {
         clearInterval(interval); // 清除定时器
         uni.hideLoading();
