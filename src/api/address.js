@@ -5,7 +5,7 @@ import httpRequest from '../http';
  */
 export function getMyAddressListAPI() {
   return httpRequest.request({
-    url: '/address/my/list',
+    url: '/address/list',
     method: 'get',
   });
 }

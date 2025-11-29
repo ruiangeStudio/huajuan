@@ -2,12 +2,12 @@
   <view v-if="!loading" class="form-container">
     <view class="form-item">
       <text>收货人</text>
-      <input v-model="formData.name" placeholder="请输入收货人姓名" />
+      <input v-model="formData.receiver" placeholder="请输入收货人姓名" />
     </view>
 
     <view class="form-item">
       <text>手机号码</text>
-      <input v-model="formData.mobile" type="number" placeholder="请输入手机号码" maxlength="11" />
+      <input v-model="formData.phone" type="number" placeholder="请输入手机号码" maxlength="11" />
     </view>
 
     <view class="form-item">
@@ -22,12 +22,12 @@
 
     <view class="form-item">
       <text>详细地址</text>
-      <input v-model="formData.address_detail" placeholder="请输入详细地址（如街道、门牌号等）" />
+      <input v-model="formData.detailAddress" placeholder="请输入详细地址（如街道、门牌号等）" />
     </view>
 
     <view class="form-item">
       <text>是否默认</text>
-      <switch :checked="formData.is_default" @change="onDefaultChange" />
+      <switch :checked="formData.isDefault" @change="onDefaultChange" />
     </view>
 
     <view
@@ -65,13 +65,13 @@
 
   const windowHeight = uni.getSystemInfoSync().windowHeight;
   const formData = ref({
-    name: '',
-    mobile: '',
+    receiver: '',
+    phone: '',
     province: '',
     city: '',
-    area: '',
-    address_detail: '',
-    is_default: false,
+    district: '',
+    detailAddress: '',
+    isDefault: false,
   });
 
   const showSuccessModal = ref(false);
@@ -81,28 +81,28 @@
 
   // 省市区选择器的显示值
   const regionValue = computed(() => {
-    if (formData.value.province && formData.value.city && formData.value.area) {
-      return [formData.value.province, formData.value.city, formData.value.area];
+    if (formData.value.province && formData.value.city && formData.value.district) {
+      return [formData.value.province, formData.value.city, formData.value.district];
     }
     return [];
   });
 
   const regionText = computed(() => {
-    if (formData.value.province && formData.value.city && formData.value.area) {
-      return `${formData.value.province} ${formData.value.city} ${formData.value.area}`;
+    if (formData.value.province && formData.value.city && formData.value.district) {
+      return `${formData.value.province} ${formData.value.city} ${formData.value.district}`;
     }
     return '';
   });
 
   const onRegionChange = (e) => {
-    const [province, city, area] = e.detail.value;
+    const [province, city, district] = e.detail.value;
     formData.value.province = province;
     formData.value.city = city;
-    formData.value.area = area;
+    formData.value.district = district;
   };
 
   const onDefaultChange = (e) => {
-    formData.value.is_default = e.detail.value;
+    formData.value.isDefault = e.detail.value;
   };
 
   const closeSuccessModal = () => {
@@ -114,23 +114,23 @@
     if (formLoading.value) return;
 
     // 校验
-    if (!formData.value.name) {
+    if (!formData.value.receiver) {
       uni.showToast({ title: '收货人不能为空', icon: 'none' });
       return;
     }
-    if (!formData.value.mobile) {
+    if (!formData.value.phone) {
       uni.showToast({ title: '手机号码不能为空', icon: 'none' });
       return;
     }
-    if (!/^1[3-9]\d{9}$/.test(formData.value.mobile)) {
+    if (!/^1[3-9]\d{9}$/.test(formData.value.phone)) {
       uni.showToast({ title: '手机号码格式不正确', icon: 'none' });
       return;
     }
-    if (!formData.value.province || !formData.value.city || !formData.value.area) {
+    if (!formData.value.province || !formData.value.city || !formData.value.district) {
       uni.showToast({ title: '请选择所在地区', icon: 'none' });
       return;
     }
-    if (!formData.value.address_detail) {
+    if (!formData.value.detailAddress) {
       uni.showToast({ title: '详细地址不能为空', icon: 'none' });
       return;
     }
@@ -189,7 +189,7 @@
       if (data) {
         formData.value = {
             ...data,
-            is_default: !!data.is_default // 确保是 boolean
+            isDefault: !!data.isDefault // 确保是 boolean
         };
       }
     } catch (e) {

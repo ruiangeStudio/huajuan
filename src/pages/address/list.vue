@@ -15,22 +15,22 @@
           @click="goEdit(item._id)"
           @longpress="onLongPress(item._id)"
         >
-          <view v-if="item.is_default" class="default-tag">默认</view>
+          <view v-if="item.isDefault" class="default-tag">默认</view>
           <view class="card-row">
             <text class="label">收货人：</text>
-            <text class="value">{{ item.name }}</text>
+            <text class="value">{{ item.receiver }}</text>
           </view>
           <view class="card-row">
             <text class="label">手机号码：</text>
-            <text class="value">{{ item.mobile }}</text>
+            <text class="value">{{ item.phone }}</text>
           </view>
           <view class="card-row">
             <text class="label">所在地区：</text>
-            <text class="value">{{ item.province }} {{ item.city }} {{ item.area }}</text>
+            <text class="value">{{ item.province }} {{ item.city }} {{ item.district }}</text>
           </view>
           <view class="card-row">
             <text class="label">详细地址：</text>
-            <text class="value">{{ item.address_detail }}</text>
+            <text class="value">{{ item.detailAddress }}</text>
           </view>
         </view>
       </view>
