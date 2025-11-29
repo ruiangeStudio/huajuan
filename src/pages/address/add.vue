@@ -1,21 +1,17 @@
-<template>
+<template xmlns="">
   <view v-if="!loading" class="form-container">
     <view class="form-item">
       <text class="label">收货人</text>
-      <input 
-        v-model="formData.receiver" 
-        placeholder="请输入收货人姓名" 
-        class="form-input"
-      />
+      <input v-model="formData.receiver" placeholder="请输入收货人姓名" class="form-input" />
     </view>
 
     <view class="form-item">
       <text class="label">手机号码</text>
-      <input 
-        v-model="formData.phone" 
-        type="number" 
-        placeholder="请输入手机号码" 
-        maxlength="11" 
+      <input
+        v-model="formData.phone"
+        type="number"
+        placeholder="请输入手机号码"
+        maxlength="11"
         class="form-input"
       />
     </view>
@@ -32,26 +28,58 @@
 
     <view class="form-item">
       <text class="label">详细地址</text>
-      <input 
-        v-model="formData.detailAddress" 
-        placeholder="请输入详细地址（如街道、门牌号等）" 
+      <input
+        v-model="formData.detailAddress"
+        placeholder="请输入详细地址（如街道、门牌号等）"
         class="form-input"
       />
     </view>
 
     <view class="form-item switch-item">
       <text class="label">是否默认</text>
-      <switch 
-        :checked="formData.isDefault" 
-        @change="onDefaultChange" 
-        color="#07c160"
-      />
+      <switch :checked="formData.isDefault" @change="onDefaultChange" color="#07c160" />
+    </view>
+
+    <!-- 折叠面板 - 选填信息 -->
+    <view class="collapse-panel">
+      <view class="collapse-header" @click="toggleCollapse">
+        <text class="collapse-title">选填信息</text>
+        <text class="collapse-arrow" :class="{ 'arrow-rotate': !isCollapsed }">﹀</text>
+      </view>
+      <view class="collapse-content" v-show="!isCollapsed">
+        <view class="form-item">
+          <text class="label">性别</text>
+          <view class="radio-group">
+            <label class="radio-item">
+              <radio
+                value="male"
+                :checked="formData.gender === 'male'"
+                @click="formData.gender = 'male'"
+              />
+              男
+            </label>
+            <label class="radio-item">
+              <radio
+                value="female"
+                :checked="formData.gender === 'female'"
+                @click="formData.gender = 'female'"
+              />
+              女
+            </label>
+            <label class="radio-item">
+              <radio
+                value="other"
+                :checked="formData.gender === 'other' || formData.gender === ''"
+                @click="formData.gender = 'other'"
+              />其他
+            </label>
+          </view>
+        </view>
+      </view>
     </view>
 
     <!-- 使用 hj-button 组件 -->
-    <hj-button 
-      :disabled="formLoading" 
-      @click="handleSubmit">
+    <hj-button :disabled="formLoading" @click="handleSubmit">
       {{ formLoading ? '提交中...' : '提交' }}
     </hj-button>
 
@@ -63,7 +91,12 @@
           <text class="success-text">保存成功</text>
         </view>
         <view class="modal-footer">
-          <hj-button @click="closeSuccessModal" type="primary" customStyle="width: auto; padding: 10px 20px;">确定</hj-button>
+          <hj-button
+            @click="closeSuccessModal"
+            type="primary"
+            customStyle="width: auto; padding:10px 20px;"
+            >确定</hj-button
+          >
         </view>
       </view>
     </view>
@@ -85,6 +118,7 @@
   const windowHeight = uni.getSystemInfoSync().windowHeight;
   const formData = ref({
     receiver: '',
+    gender: 'other', // 默认值改为 other
     phone: '',
     province: '',
     city: '',
@@ -97,6 +131,7 @@
   const loading = ref(false);
   const formLoading = ref(false);
   const id = ref(null);
+  const isCollapsed = ref(true); // 默认折叠
 
   // 省市区选择器的显示值
   const regionValue = computed(() => {
@@ -122,6 +157,11 @@
 
   const onDefaultChange = (e) => {
     formData.value.isDefault = e.detail.value;
+  };
+
+  // 切换折叠面板
+  const toggleCollapse = () => {
+    isCollapsed.value = !isCollapsed.value;
   };
 
   const closeSuccessModal = () => {
@@ -183,31 +223,30 @@
     formLoading.value = true;
     try {
       await uni.showLoading({ title: '提交中' });
-      
+
       // 根据操作类型选择对应的API
       const apiMap = {
         add: addAddressAPI,
-        update: updateAddressAPI
+        update: updateAddressAPI,
       };
-      
+
       const api = apiMap[action];
       const actionText = action === 'add' ? '添加' : '修改';
-      
       const result = await api(params);
-      
+
       if (result.code === 2000) {
         showSuccessModal.value = true;
       } else {
         await uni.showToast({
           title: result.data?.msg || `${actionText}失败`,
-          icon: 'none'
+          icon: 'none',
         });
       }
     } catch (error) {
       console.error(`${action} address error:`, error);
       await uni.showToast({
         title: '网络错误，请稍后重试',
-        icon: 'none'
+        icon: 'none',
       });
     } finally {
       formLoading.value = false;
@@ -222,20 +261,18 @@
       if (result.code === 2000 && result.data) {
         formData.value = {
           ...result.data,
-          isDefault: !!result.data.isDefault
+          isDefault: !!result.data.isDefault,
+          gender: result.data.gender || 'other', // 如果没有设置性别，默认为 other
         };
       } else {
-        uni.showToast({ 
-          title: result.data?.msg || '获取地址详情失败', 
-          icon: 'none' 
+        await uni.showToast({
+          title: result.data?.msg || '获取地址详情失败',
+          icon: 'none',
         });
       }
     } catch (error) {
       console.error('Get address error:', error);
-      uni.showToast({ 
-        title: '网络错误，请稍后重试', 
-        icon: 'none' 
-      });
+      await uni.showToast({ title: '网络错误，请稍后重试', icon: 'none' });
     } finally {
       loading.value = false;
     }
@@ -253,11 +290,11 @@
   .form-container {
     padding: 40rpx;
     width: 100%;
-    
+
     .form-item {
       margin-bottom: 40rpx;
       box-sizing: border-box;
-      
+
       .label {
         display: block;
         margin-bottom: 16rpx;
@@ -269,7 +306,7 @@
       .form-input {
         width: 100%;
         height: 80rpx;
-        padding: 0 20rpx;
+        padding: 020rpx;
         border: 1px solid #ddd;
         border-radius: 8rpx;
         box-sizing: border-box;
@@ -286,7 +323,7 @@
         display: flex;
         align-items: center;
         cursor: pointer;
-        
+
         .picker-text {
           color: #333;
           font-size: 28rpx;
@@ -298,11 +335,61 @@
         }
       }
     }
-    
+
     .switch-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
+    }
+
+    /* 单选框样式 */
+    .radio-group {
+      display: flex;
+      align-items: center;
+
+      .radio-item {
+        display: flex;
+        align-items: center;
+        margin-right: 30rpx;
+        font-size: 28rpx;
+        color: #333;
+      }
+    }
+
+    /* 折叠面板样式*/
+    .collapse-panel {
+      margin-bottom: 40rpx;
+      border: 1px solid#ddd;
+      border-radius: 8rpx;
+
+      .collapse-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20rpx;
+        cursor: pointer;
+        background-color: #f8f8f8;
+
+        .collapse-title {
+          font-size: 28rpx;
+          color: #000; /* 加深颜色 */
+          font-weight: 500;
+        }
+
+        .collapse-arrow {
+          transition: transform 0.3s ease;
+          font-size: 32rpx;
+          color: #999;
+
+          &.arrow-rotate {
+            transform: rotate(180deg);
+          }
+        }
+      }
+
+      .collapse-content {
+        padding: 20rpx;
+      }
     }
   }
 
@@ -350,8 +437,6 @@
     text-align: center;
   }
 
-
-  
   // 移除原来的.sub-btn样式，因为现在使用的是 hj-button 组件
   .loading-container {
     display: flex;
