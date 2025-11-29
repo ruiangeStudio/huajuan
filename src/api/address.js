@@ -5,7 +5,7 @@ import httpRequest from '../http';
  */
 export function getMyAddressListAPI() {
   return httpRequest.request({
-    url: '/address/list',
+    url: '/address/my/list',
     method: 'get',
   });
 }
@@ -16,7 +16,7 @@ export function getMyAddressListAPI() {
  */
 export function getAddressAPI(id) {
   return httpRequest.request({
-    url: `/address?id=${id}`,
+    url: `/address/${id}`,
     method: 'get',
   });
 }
@@ -27,7 +27,7 @@ export function getAddressAPI(id) {
  */
 export function addAddressAPI(data) {
   return httpRequest.request({
-    url: '/address/',
+    url: '/address',
     method: 'post',
     data: data,
   });
@@ -38,8 +38,9 @@ export function addAddressAPI(data) {
  * @param data
  */
 export function updateAddressAPI(data) {
+  const id = data._id;
   return httpRequest.request({
-    url: '/address/',
+    url: `/address/${id}`,
     method: 'put',
     data: data,
   });
