@@ -120,7 +120,7 @@ httpRequest.interceptors.response.use(
     // 非 401 的错误统一提示
     try {
       await uni.showToast({
-        title: error?.data?.messages || '错误请求',
+        title: error?.data?.message || '错误请求',
         icon: 'none',
         duration: 4000,
       });
