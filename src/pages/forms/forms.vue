@@ -28,18 +28,10 @@
 
     <view class="form-item">
       <text>贴吧昵称</text>
-      <picker
-        mode="selector"
-        :range="baWuList"
-        range-key="userName"
-        :value="tiebaPickerIndex"
-        @change="onBaWuPickerChange"
-      >
-        <view class="picker-container">
-          <text v-if="formData.tieba_name" class="picker-text">{{ formData.tieba_name }}</text>
-          <text v-else class="picker-placeholder">请选择贴吧昵称</text>
-        </view>
-      </picker>
+      <view class="picker-container" @click="openBaWuSelector">
+        <text v-if="formData.tieba_name" class="picker-text">{{ formData.tieba_name }}</text>
+        <text v-else class="picker-placeholder">请选择贴吧昵称</text>
+      </view>
     </view>
 
     <view class="form-item">
@@ -54,6 +46,32 @@
       @click="handleSubmit"
       >{{ loading ? '加载中...' : '提交' }}</view
     >
+
+    <!-- 自定义吧务选择器弹窗 -->
+    <view v-if="showBaWuSelector" class="selector-overlay" @click="closeBaWuSelector">
+      <view class="selector-content" @click.stop>
+        <view class="selector-header">
+          <text class="selector-title">选择贴吧昵称</text>
+          <text class="close-btn" @click="closeBaWuSelector">×</text>
+        </view>
+        <scroll-view scroll-y class="selector-list">
+          <view
+            v-for="(item, index) in baWuList"
+            :key="index"
+            class="selector-item"
+            :class="{ active: formData.tieba_name === item.userName }"
+            @click="selectBaWu(item)"
+          >
+            <image :src="item.avatar" class="selector-avatar" mode="aspectFill"></image>
+            <view class="selector-info">
+              <text class="selector-name">{{ item.userName }}</text>
+              <text class="selector-role">{{ item.role }}</text>
+            </view>
+            <text v-if="formData.tieba_name === item.userName" class="selector-check">✓</text>
+          </view>
+        </scroll-view>
+      </view>
+    </view>
 
     <!-- 成功提示弹窗 -->
     <view v-if="showSuccessModal" class="modal-overlay">
@@ -98,6 +116,7 @@
   const formLoading = ref(false);
   const serverList = ref([]);
   const baWuList = ref([]);
+  const showBaWuSelector = ref(false);
 
   // picker相关数据
   const pickerRange = ref([[], []]); // 多列选择器的数据源
@@ -111,16 +130,19 @@
     return '';
   });
 
-  // 新增：计算贴吧昵称在列表中的索引
-  const tiebaPickerIndex = computed(() => {
-    if (!formData.value.tieba_name || baWuList.value.length === 0) {
-      return 0;
-    }
-    const index = baWuList.value.findIndex(
-      (item) => item.userName === formData.value.tieba_name
-    );
-    return index !== -1 ? index : 0;
-  });
+  // 自定义吧务选择器相关方法
+  const openBaWuSelector = () => {
+    showBaWuSelector.value = true;
+  };
+
+  const closeBaWuSelector = () => {
+    showBaWuSelector.value = false;
+  };
+
+  const selectBaWu = (item) => {
+    formData.value.tieba_name = item.userName;
+    closeBaWuSelector();
+  };
 
   const closeSuccessModal = () => {
     showSuccessModal.value = false;
@@ -451,6 +473,95 @@
       color: #fff;
       border-radius: 8rpx;
       border: none;
+    }
+  }
+
+  .selector-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    z-index: 1000;
+  }
+
+  .selector-content {
+    background-color: #fff;
+    border-top-left-radius: 24rpx;
+    border-top-right-radius: 24rpx;
+    padding-bottom: env(safe-area-inset-bottom);
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .selector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30rpx;
+    border-bottom: 1rpx solid #eee;
+    .selector-title {
+      font-size: 32rpx;
+      font-weight: bold;
+      color: #333;
+    }
+    .close-btn {
+      font-size: 40rpx;
+      color: #999;
+      padding: 0 20rpx;
+    }
+  }
+
+  .selector-list {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .selector-item {
+    display: flex;
+    align-items: center;
+    padding: 24rpx 30rpx;
+    border-bottom: 1rpx solid #f5f5f5;
+    &:active {
+      background-color: #f9f9f9;
+    }
+    &.active {
+      background-color: #f0f7ff;
+    }
+    .selector-avatar {
+      width: 80rpx;
+      height: 80rpx;
+      border-radius: 50%;
+      margin-right: 24rpx;
+      background-color: #eee;
+    }
+    .selector-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      .selector-name {
+        font-size: 30rpx;
+        color: #333;
+        margin-bottom: 8rpx;
+      }
+      .selector-role {
+        font-size: 24rpx;
+        color: #007aff;
+        background-color: rgba(0, 122, 255, 0.1);
+        padding: 4rpx 12rpx;
+        border-radius: 6rpx;
+        align-self: flex-start;
+      }
+    }
+    .selector-check {
+      color: #007aff;
+      font-size: 36rpx;
+      font-weight: bold;
     }
   }
 
