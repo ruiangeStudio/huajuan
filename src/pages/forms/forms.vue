@@ -28,7 +28,18 @@
 
     <view class="form-item">
       <text>贴吧昵称</text>
-      <input v-model="formData.tieba_name" placeholder="请输入贴吧昵称" />
+      <picker
+        mode="selector"
+        :range="baWuList"
+        range-key="userName"
+        :value="tiebaPickerIndex"
+        @change="onBaWuPickerChange"
+      >
+        <view class="picker-container">
+          <text v-if="formData.tieba_name" class="picker-text">{{ formData.tieba_name }}</text>
+          <text v-else class="picker-placeholder">请选择贴吧昵称</text>
+        </view>
+      </picker>
     </view>
 
     <view class="form-item">
@@ -72,7 +83,7 @@
   } from '../../api/gameAccount';
   import { onLoad } from '@dcloudio/uni-app';
   import loadingImg from '../../static/13395852403014388.gif';
-  import { getGameServerListApi } from '../../api/jiuYin';
+  import { getGameServerListApi, syncBaWuApi } from '../../api/jiuYin';
   const windowHeight = uni.getSystemInfoSync().windowHeight;
   const formData = ref({
     game_nick_name: '',
@@ -86,6 +97,7 @@
   const loading = ref(false);
   const formLoading = ref(false);
   const serverList = ref([]);
+  const baWuList = ref([]);
 
   // picker相关数据
   const pickerRange = ref([[], []]); // 多列选择器的数据源
@@ -97,6 +109,17 @@
       return formData.value.game_server;
     }
     return '';
+  });
+
+  // 新增：计算贴吧昵称在列表中的索引
+  const tiebaPickerIndex = computed(() => {
+    if (!formData.value.tieba_name || baWuList.value.length === 0) {
+      return 0;
+    }
+    const index = baWuList.value.findIndex(
+      (item) => item.userName === formData.value.tieba_name
+    );
+    return index !== -1 ? index : 0;
   });
 
   const closeSuccessModal = () => {
@@ -249,6 +272,7 @@
       getGameAccount(id.value);
     }
     getGameServerList();
+    getBaWuList();
   });
   // 根据已保存的数据设置picker初始值
   const setPickerValueFromSavedData = () => {
@@ -348,6 +372,24 @@
       initPickerData();
     } catch (error) {
       console.error('获取服务器列表失败:', error);
+    }
+  };
+
+  const getBaWuList = async () => {
+    try {
+      const { code, data } = await syncBaWuApi();
+      if (code === 2000) {
+        baWuList.value = data;
+      }
+    } catch (error) {
+      console.error('获取吧务列表失败:', error);
+    }
+  };
+
+  const onBaWuPickerChange = (e) => {
+    const index = e.detail.value;
+    if (baWuList.value[index]) {
+      formData.value.tieba_name = baWuList.value[index].userName;
     }
   };
 </script>
