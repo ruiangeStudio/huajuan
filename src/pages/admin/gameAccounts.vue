@@ -67,6 +67,7 @@
   import { ref, computed } from 'vue';
   import { getAllGameAccountAPI, exportGameAccountAPI } from '../../api/gameAccount.js';
   import loadingImg from '../../static/13395852403014388.gif';
+  import dayjs from 'dayjs';
 
   const windowHeight = uni.getSystemInfoSync().windowHeight;
   const list = ref([]);
@@ -117,13 +118,17 @@
     console.log('开始导出表格');
     if (exportLoading.value ) return;
     exportLoading.value = true;
+    const url = `${import.meta.env.VITE_APP_API_URL}/gameAccount/export`
+
     uni.downloadFile({
-      url: `${import.meta.env.VITE_APP_API_URL}/gameAccount/export`,
+      url,
       success: async (res) => {
         const { tempFilePath } = res;
         console.log('下载文件成功：', tempFilePath);
+        const currentDate = dayjs().format('YYYY年MM月DD日HH时');
         uni.shareFileMessage({
           filePath: tempFilePath,
+          fileName: `游戏账号列表_${currentDate}.xlsx`,
           success: () => {
             uni.showToast({
               title: '文件已分享到聊天',
