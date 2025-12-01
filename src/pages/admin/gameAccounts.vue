@@ -119,9 +119,13 @@
     if (exportLoading.value ) return;
     exportLoading.value = true;
     const url = `${import.meta.env.VITE_APP_API_URL}/gameAccount/export`
-
+    const token = uni.getStorageSync('token');
+    
     uni.downloadFile({
       url,
+      header: {
+        Authorization: token,
+      },
       success: async (res) => {
         const { tempFilePath } = res;
         console.log('下载文件成功：', tempFilePath);

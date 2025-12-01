@@ -46,11 +46,10 @@ export const useAuthStore = defineStore('auth', {
         title: '登录中...',
       });
       const { code } = await uni.login();
-      console.log(code,'code=========')
       const { data, code: resCode } = await loginAPI({ code });
-      console.log(resCode,'rescode===========')
       if (resCode === 2000) {
         uni.setStorageSync('token', data.token);
+        uni.setStorageSync('openid', data.openid);
         uni.setStorageSync('userInfo', data.userInfo);
         this.setToken(data.token);
         this.setUserInfo(data.userInfo);

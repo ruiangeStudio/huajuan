@@ -58,6 +58,8 @@
           ></image>
         </view>
       </view>
+
+      <view class="openid-box" v-if="openid" @click="copyOpenId"> OpenID: {{ openid }} </view>
     </view>
   </view>
 </template>
@@ -103,7 +105,21 @@
     uni.clearStorageSync();
     uni.showToast({
       title: '缓存已清除',
-      icon: 'none'
+      icon: 'none',
+    });
+  };
+
+  const openid = ref('');
+  const copyOpenId = () => {
+    if (!openid.value) return;
+    uni.setClipboardData({
+      data: openid.value,
+      success: () => {
+        uni.showToast({
+          title: '复制成功',
+          icon: 'none',
+        });
+      },
     });
   };
 
@@ -113,6 +129,7 @@
       AuthStore.UPDATE_INFO();
     }
     RandomAvatar.value = generateRandomAvatar();
+    openid.value = uni.getStorageSync('openid');
   });
   const days = ref(0);
   onShareAppMessage(() => {
@@ -244,7 +261,7 @@
         url('https://s1.locimg.com/2025/04/10/c15d3545441ca.jpg') center/cover no-repeat;
     }
   }
-  .container{
+  .container {
     position: absolute;
     top: 550rpx;
     width: 100%;
@@ -266,5 +283,16 @@
       border-radius: 10rpx;
       margin-bottom: 20rpx;
     }
+  }
+  .openid-box {
+    position: fixed;
+    bottom: 40rpx;
+    width: 100%;
+    text-align: center;
+    font-size: 20rpx;
+    color: #ccc;
+    left: 0;
+    padding-top: 50rpx;
+    padding-bottom: 50rpx;
   }
 </style>
