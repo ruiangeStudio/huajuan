@@ -3,8 +3,7 @@ const ci = require('miniprogram-ci');
 // 引入Node.js内置path模块，用于处理文件路径
 const path = require('path');
 
-// 加载dotenv模块，用于从.env文件加载环境变量（虽然代码中未使用）
-require('dotenv').config();
+
 
 // 引入项目根目录下的package.json文件，主要用于获取版本号
 const packageJson = require('../package.json');
