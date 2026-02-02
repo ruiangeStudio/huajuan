@@ -35,6 +35,39 @@
       />
     </view>
 
+    <view class="form-item">
+      <text class="label">贴吧昵称</text>
+      <view class="picker-container" @click="openBaWuSelector">
+        <text v-if="formData.tieba_name" class="picker-text">{{ formData.tieba_name }}</text>
+        <text v-else class="picker-placeholder">请选择贴吧昵称</text>
+      </view>
+    </view>
+
+    <view v-if="showBaWuSelector" class="selector-overlay" @click="closeBaWuSelector">
+      <view class="selector-content" @click.stop>
+        <view class="selector-header">
+          <text class="selector-title">选择贴吧昵称</text>
+          <text class="close-btn" @click="closeBaWuSelector">×</text>
+        </view>
+        <scroll-view scroll-y class="selector-list">
+          <view
+            v-for="(item, index) in baWuList"
+            :key="index"
+            class="selector-item"
+            :class="{ active: formData.tieba_name === item.userName }"
+            @click="selectBaWu(item)"
+          >
+            <image :src="item.avatar" class="selector-avatar" mode="aspectFill"></image>
+            <view class="selector-info">
+              <text class="selector-name">{{ item.userName }}</text>
+              <text class="selector-role">{{ item.role }}</text>
+            </view>
+            <text v-if="formData.tieba_name === item.userName" class="selector-check">✓</text>
+          </view>
+        </scroll-view>
+      </view>
+    </view>
+
     <view class="form-item switch-item">
       <text class="label">是否默认</text>
       <switch :checked="formData.isDefault" @change="onDefaultChange" color="#07c160" />
@@ -114,6 +147,7 @@
   import loadingImg from '../../static/13395852403014388.gif';
   // 导入 hj-button 组件
   import HjButton from '../../components/hj-button.vue';
+  import { syncBaWuApi } from '../../api/jiuYin';
 
   const windowHeight = uni.getSystemInfoSync().windowHeight;
   const formData = ref({
@@ -125,6 +159,7 @@
     district: '',
     detailAddress: '',
     isDefault: false,
+    tieba_name: '',
   });
 
   const showSuccessModal = ref(false);
@@ -132,6 +167,8 @@
   const formLoading = ref(false);
   const id = ref(null);
   const isCollapsed = ref(true); // 默认折叠
+  const baWuList = ref([]);
+  const showBaWuSelector = ref(false);
 
   // 省市区选择器的显示值
   const regionValue = computed(() => {
@@ -162,6 +199,17 @@
   // 切换折叠面板
   const toggleCollapse = () => {
     isCollapsed.value = !isCollapsed.value;
+  };
+
+  const openBaWuSelector = () => {
+    showBaWuSelector.value = true;
+  };
+  const closeBaWuSelector = () => {
+    showBaWuSelector.value = false;
+  };
+  const selectBaWu = (item) => {
+    formData.value.tieba_name = item.userName;
+    closeBaWuSelector();
   };
 
   const closeSuccessModal = () => {
@@ -197,6 +245,11 @@
     // 详细地址验证
     if (!formData.value.detailAddress) {
       uni.showToast({ title: '详细地址不能为空', icon: 'none' });
+      return false;
+    }
+
+    if (!formData.value.tieba_name) {
+      uni.showToast({ title: '贴吧昵称不能为空', icon: 'none' });
       return false;
     }
 
@@ -278,11 +331,23 @@
     }
   };
 
+  const getBaWuList = async () => {
+    try {
+      const { code, data } = await syncBaWuApi();
+      if (code === 2000) {
+        baWuList.value = data;
+      }
+    } catch (error) {
+      console.error('获取吧务列表失败:', error);
+    }
+  };
+
   onLoad((options) => {
     if (options.id) {
       id.value = options.id;
       getAddress(options.id);
     }
+    getBaWuList();
   });
 </script>
 
@@ -445,5 +510,89 @@
     .loading-img {
       width: 80%;
     }
+  }
+  .selector-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    z-index: 1000;
+  }
+  .selector-content {
+    background-color: #fff;
+    border-top-left-radius: 24rpx;
+    border-top-right-radius: 24rpx;
+    padding-bottom: env(safe-area-inset-bottom);
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .selector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30rpx;
+    border-bottom: 1rpx solid #eee;
+  }
+  .selector-title {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: #333;
+  }
+  .close-btn {
+    font-size: 40rpx;
+    color: #999;
+    padding: 0 20rpx;
+  }
+  .selector-list {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  .selector-item {
+    display: flex;
+    align-items: center;
+    padding: 24rpx 30rpx;
+    border-bottom: 1rpx solid #f5f5f5;
+  }
+  .selector-item:active {
+    background-color: #f9f9f9;
+  }
+  .selector-item.active {
+    background-color: #f0f7ff;
+  }
+  .selector-avatar {
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 50%;
+    margin-right: 24rpx;
+    background-color: #eee;
+  }
+  .selector-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .selector-name {
+    font-size: 30rpx;
+    color: #333;
+    margin-bottom: 8rpx;
+  }
+  .selector-role {
+    font-size: 24rpx;
+    color: #007aff;
+    background-color: rgba(0, 122, 255, 0.1);
+    padding: 4rpx 12rpx;
+    border-radius: 6rpx;
+    align-self: flex-start;
+  }
+  .selector-check {
+    color: #007aff;
+    font-size: 36rpx;
+    font-weight: bold;
   }
 </style>
