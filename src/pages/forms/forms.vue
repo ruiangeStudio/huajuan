@@ -396,7 +396,11 @@
       console.error('获取服务器列表失败:', error);
     }
   };
-
+  
+  /**
+   * 获取吧务列表
+   * @returns {Promise<void>}
+   */
   const getBaWuList = async () => {
     try {
       const { code, data } = await syncBaWuApi();
