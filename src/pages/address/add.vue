@@ -1,143 +1,148 @@
 <template xmlns="">
-  <view v-if="!loading" class="form-container">
-    <view class="form-item">
-      <text class="label">收货人</text>
-      <input v-model="formData.receiver" placeholder="请输入收货人姓名" class="form-input" />
-    </view>
-
-    <view class="form-item">
-      <text class="label">手机号码</text>
-      <input
-        v-model="formData.phone"
-        type="number"
-        placeholder="请输入手机号码"
-        maxlength="11"
-        class="form-input"
-      />
-    </view>
-
-    <view class="form-item">
-      <text class="label">所在地区</text>
-      <picker mode="region" @change="onRegionChange" :value="regionValue">
-        <view class="picker-container">
-          <text v-if="regionText" class="picker-text">{{ regionText }}</text>
-          <text v-else class="picker-placeholder">请选择所在地区</text>
-        </view>
-      </picker>
-    </view>
-
-    <view class="form-item">
-      <text class="label">详细地址</text>
-      <input
-        v-model="formData.detailAddress"
-        placeholder="请输入详细地址（如街道、门牌号等）"
-        class="form-input"
-      />
-    </view>
-
-    <view class="form-item">
-      <text class="label">贴吧昵称</text>
-      <view class="picker-container" @click="openBaWuSelector">
-        <text v-if="formData.tieba_name" class="picker-text">{{ formData.tieba_name }}</text>
-        <text v-else class="picker-placeholder">请选择贴吧昵称</text>
+  <template v-if="addressBtnShow">
+    <view v-if="!loading" class="form-container">
+      <view class="form-item">
+        <text class="label">收货人</text>
+        <input v-model="formData.receiver" placeholder="请输入收货人姓名" class="form-input" />
       </view>
-    </view>
 
-    <view v-if="showBaWuSelector" class="selector-overlay" @click="closeBaWuSelector">
-      <view class="selector-content" @click.stop>
-        <view class="selector-header">
-          <text class="selector-title">选择贴吧昵称</text>
-          <text class="close-btn" @click="closeBaWuSelector">×</text>
+      <view class="form-item">
+        <text class="label">手机号码</text>
+        <input
+          v-model="formData.phone"
+          type="number"
+          placeholder="请输入手机号码"
+          maxlength="11"
+          class="form-input"
+        />
+      </view>
+
+      <view class="form-item">
+        <text class="label">所在地区</text>
+        <picker mode="region" @change="onRegionChange" :value="regionValue">
+          <view class="picker-container">
+            <text v-if="regionText" class="picker-text">{{ regionText }}</text>
+            <text v-else class="picker-placeholder">请选择所在地区</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-item">
+        <text class="label">详细地址</text>
+        <input
+          v-model="formData.detailAddress"
+          placeholder="请输入详细地址（如街道、门牌号等）"
+          class="form-input"
+        />
+      </view>
+
+      <view class="form-item">
+        <text class="label">贴吧昵称</text>
+        <view class="picker-container" @click="openBaWuSelector">
+          <text v-if="formData.tieba_name" class="picker-text">{{ formData.tieba_name }}</text>
+          <text v-else class="picker-placeholder">请选择贴吧昵称</text>
         </view>
-        <scroll-view scroll-y class="selector-list">
-          <view
-            v-for="(item, index) in baWuList"
-            :key="index"
-            class="selector-item"
-            :class="{ active: formData.tieba_name === item.userName }"
-            @click="selectBaWu(item)"
-          >
-            <image :src="item.avatar" class="selector-avatar" mode="aspectFill"></image>
-            <view class="selector-info">
-              <text class="selector-name">{{ item.userName }}</text>
-              <text class="selector-role">{{ item.role }}</text>
+      </view>
+
+      <view v-if="showBaWuSelector" class="selector-overlay" @click="closeBaWuSelector">
+        <view class="selector-content" @click.stop>
+          <view class="selector-header">
+            <text class="selector-title">选择贴吧昵称</text>
+            <text class="close-btn" @click="closeBaWuSelector">×</text>
+          </view>
+          <scroll-view scroll-y class="selector-list">
+            <view
+              v-for="(item, index) in baWuList"
+              :key="index"
+              class="selector-item"
+              :class="{ active: formData.tieba_name === item.userName }"
+              @click="selectBaWu(item)"
+            >
+              <image :src="item.avatar" class="selector-avatar" mode="aspectFill"></image>
+              <view class="selector-info">
+                <text class="selector-name">{{ item.userName }}</text>
+                <text class="selector-role">{{ item.role }}</text>
+              </view>
+              <text v-if="formData.tieba_name === item.userName" class="selector-check">✓</text>
             </view>
-            <text v-if="formData.tieba_name === item.userName" class="selector-check">✓</text>
+          </scroll-view>
+        </view>
+      </view>
+
+      <view class="form-item switch-item">
+        <text class="label">是否默认</text>
+        <switch :checked="formData.isDefault" @change="onDefaultChange" color="#07c160" />
+      </view>
+
+      <!-- 折叠面板 - 选填信息 -->
+      <view class="collapse-panel">
+        <view class="collapse-header" @click="toggleCollapse">
+          <text class="collapse-title">选填信息</text>
+          <text class="collapse-arrow" :class="{ 'arrow-rotate': !isCollapsed }">﹀</text>
+        </view>
+        <view class="collapse-content" v-show="!isCollapsed">
+          <view class="form-item">
+            <text class="label">性别</text>
+            <view class="radio-group">
+              <label class="radio-item">
+                <radio
+                  value="male"
+                  :checked="formData.gender === 'male'"
+                  @click="formData.gender = 'male'"
+                />
+                男
+              </label>
+              <label class="radio-item">
+                <radio
+                  value="female"
+                  :checked="formData.gender === 'female'"
+                  @click="formData.gender = 'female'"
+                />
+                女
+              </label>
+              <label class="radio-item">
+                <radio
+                  value="other"
+                  :checked="formData.gender === 'other' || formData.gender === ''"
+                  @click="formData.gender = 'other'"
+                />其他
+              </label>
+            </view>
           </view>
-        </scroll-view>
+        </view>
       </view>
-    </view>
 
-    <view class="form-item switch-item">
-      <text class="label">是否默认</text>
-      <switch :checked="formData.isDefault" @change="onDefaultChange" color="#07c160" />
-    </view>
+      <!-- 使用 hj-button 组件 -->
+      <hj-button :disabled="formLoading" @click="handleSubmit">
+        {{ formLoading ? '提交中...' : '提交' }}
+      </hj-button>
 
-    <!-- 折叠面板 - 选填信息 -->
-    <view class="collapse-panel">
-      <view class="collapse-header" @click="toggleCollapse">
-        <text class="collapse-title">选填信息</text>
-        <text class="collapse-arrow" :class="{ 'arrow-rotate': !isCollapsed }">﹀</text>
-      </view>
-      <view class="collapse-content" v-show="!isCollapsed">
-        <view class="form-item">
-          <text class="label">性别</text>
-          <view class="radio-group">
-            <label class="radio-item">
-              <radio
-                value="male"
-                :checked="formData.gender === 'male'"
-                @click="formData.gender = 'male'"
-              />
-              男
-            </label>
-            <label class="radio-item">
-              <radio
-                value="female"
-                :checked="formData.gender === 'female'"
-                @click="formData.gender = 'female'"
-              />
-              女
-            </label>
-            <label class="radio-item">
-              <radio
-                value="other"
-                :checked="formData.gender === 'other' || formData.gender === ''"
-                @click="formData.gender = 'other'"
-              />其他
-            </label>
+      <!-- 成功提示弹窗 -->
+      <view v-if="showSuccessModal" class="modal-overlay">
+        <view class="modal-content">
+          <view class="modal-body">
+            <text class="success-icon">✓</text>
+            <text class="success-text">保存成功</text>
+          </view>
+          <view class="modal-footer">
+            <hj-button
+              @click="closeSuccessModal"
+              type="primary"
+              customStyle="width: auto; padding:10px 20px;"
+              >确定</hj-button
+            >
           </view>
         </view>
       </view>
     </view>
-
-    <!-- 使用 hj-button 组件 -->
-    <hj-button :disabled="formLoading" @click="handleSubmit">
-      {{ formLoading ? '提交中...' : '提交' }}
-    </hj-button>
-
-    <!-- 成功提示弹窗 -->
-    <view v-if="showSuccessModal" class="modal-overlay">
-      <view class="modal-content">
-        <view class="modal-body">
-          <text class="success-icon">✓</text>
-          <text class="success-text">保存成功</text>
-        </view>
-        <view class="modal-footer">
-          <hj-button
-            @click="closeSuccessModal"
-            type="primary"
-            customStyle="width: auto; padding:10px 20px;"
-            >确定</hj-button
-          >
-        </view>
-      </view>
+    <view
+      v-if="loading"
+      :style="`width: 100%;height: ${windowHeight}px;`"
+      class="loading-container"
+    >
+      <image class="loading-img" :src="loadingImg" mode="widthFix"></image>
     </view>
-  </view>
-
-  <view v-if="loading" :style="`width: 100%;height: ${windowHeight}px;`" class="loading-container">
-    <image class="loading-img" :src="loadingImg" mode="widthFix"></image>
-  </view>
+  </template>
 </template>
 
 <script setup>
@@ -148,6 +153,7 @@
   // 导入 hj-button 组件
   import HjButton from '../../components/hj-button.vue';
   import { syncBaWuApi } from '../../api/jiuYin';
+  import { getPublicAddressBtnShowAPI } from '../../api/public';
 
   const windowHeight = uni.getSystemInfoSync().windowHeight;
   const formData = ref({
@@ -342,12 +348,24 @@
     }
   };
 
+  const addressBtnShow = ref(false);
+  const getPublicAddressBtnShow = async () => {
+    const { data } = await getPublicAddressBtnShowAPI();
+    addressBtnShow.value = data;
+    if (!data) {
+      uni.redirectTo({
+        url: '/pages/forms/forms',
+      });
+    }
+  };
+
   onLoad((options) => {
     if (options.id) {
       id.value = options.id;
       getAddress(options.id);
     }
     getBaWuList();
+    getPublicAddressBtnShow();
   });
 </script>
 

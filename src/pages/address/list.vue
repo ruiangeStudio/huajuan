@@ -46,6 +46,7 @@
   import { getMyAddressListAPI, deleteAddressAPI } from '../../api/address';
   import { onShow } from '@dcloudio/uni-app';
   import loadingImg from '../../static/13395852403014388.gif';
+  import { getPublicAddressBtnShowAPI } from '../../api/public';
   const windowHeight = uni.getSystemInfoSync().windowHeight;
   const addressList = ref([]);
   const loading = ref(true);
@@ -61,10 +62,6 @@
       loading.value = false;
     }
   };
-
-  onShow(() => {
-    fetchAddressList();
-  });
 
   // 跳转到编辑页面
   const goEdit = (id) => {
@@ -94,6 +91,21 @@
       },
     });
   };
+
+  const addressBtnShow = ref(false);
+  const getPublicAddressBtnShow = async () => {
+    const { data } = await getPublicAddressBtnShowAPI();
+    addressBtnShow.value = data;
+    if (!data) {
+      uni.redirectTo({
+        url: '/pages/forms/list',
+      });
+    }
+  };
+  onShow(() => {
+    fetchAddressList();
+    getPublicAddressBtnShow();
+  });
 </script>
 
 <style scoped lang="less">
