@@ -28,7 +28,7 @@
           mode="widthFix"
         ></image>
       </view>
-      <view class="box box2" @click="myAddress">我的地址</view>
+      <view v-if="addressBtnShow" class="box box2" @click="myAddress">我的地址</view>
     </view>
 
     <view class="container">
@@ -70,12 +70,19 @@
   import { computed, ref, watch } from 'vue';
   import { getUserInfoAPI } from '../../api/user';
   import { generateRandomAvatar } from '../../utils';
+  import { getPublicAddressBtnShowAPI } from '../../api/public';
 
   const RandomAvatar = ref('');
   const AuthStore = useAuthStore();
   const userInfo = computed(() => {
     return AuthStore.getUserInfo;
   });
+
+  const addressBtnShow = ref(false);
+  const getPublicAddressBtnShow = async () => {
+    const { data } = await getPublicAddressBtnShowAPI();
+    addressBtnShow.value = data;
+  };
 
   const myGameAccount = () => {
     console.log('=======');
@@ -130,6 +137,7 @@
     }
     RandomAvatar.value = generateRandomAvatar();
     openid.value = uni.getStorageSync('openid');
+    getPublicAddressBtnShow();
   });
   const days = ref(0);
   onShareAppMessage(() => {
@@ -222,7 +230,7 @@
     justify-content: space-between;
     padding: 30rpx;
     .box {
-      width: 325rpx;
+      width: 100%;
       height: 120rpx;
       border-radius: 20rpx;
       background-color: #fff;
@@ -235,6 +243,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 20rpx;
+
       background:
         linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)),
         url('https://9yin.woniu.com/static/act/202412/3/images/bg.jpg') center/cover no-repeat;
@@ -255,7 +264,7 @@
       font-size: 34rpx;
       font-weight: 800;
       color: #000;
-
+      margin-left: 40rpx;
       background:
         linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)),
         url('https://s1.locimg.com/2025/04/10/c15d3545441ca.jpg') center/cover no-repeat;
